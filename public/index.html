@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIT Escala</title>
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="icon" href="favicon-64.png" sizes="64x64">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+:root{
+  --bg-deep:#1B1730;
+  --bg-panel:#241E3D;
+  --bg-panel-2:#2D2650;
+  --bg-input:#181430;
+  --accent-amber:#E8A33D;
+  --accent-amber-dim:#8C6A34;
+  --accent-rose:#C97B84;
+  --accent-teal:#5FA8A0;
+  --text-primary:#F5EFE6;
+  --text-muted:#A79CC4;
+  --text-faint:#6F6791;
+  --border:rgba(245,239,230,0.10);
+  --border-strong:rgba(245,239,230,0.20);
+  --danger:#D2645A;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg-deep);
+  color:var(--text-primary);
+  font-family:'Inter',system-ui,sans-serif;
+  min-height:100vh;
+}
+button{font-family:inherit;cursor:pointer;}
+input,textarea{font-family:inherit;}
+
+/* ---------- layout shell ---------- */
+#app{max-width:1180px;margin:0 auto;padding:0 20px 60px;}
+
+.app-header{
+  position:relative;
+  padding:44px 4px 30px;
+  overflow:hidden;
+}
+.staff-bg{
+  position:absolute;
+  left:-4px;right:-4px;top:18px;
+  height:70px;
+  pointer-events:none;
+  opacity:0.55;
+}
+.staff-bg line{stroke:var(--border-strong);stroke-width:1;}
+.header-content{position:relative;z-index:1;}
+
+.escala-brand-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:22px;
+}
+.escala-brand-logo{
+  width:40px;height:40px;
+  border-radius:10px;
+  background:var(--bg-panel-2);
+  border:1px solid var(--border-strong);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  flex:0 0 auto;
+}
+.escala-brand-logo img{width:100%;height:100%;object-fit:cover;}
+#mitBrandLogoFallback{
+  font-family:'IBM Plex Mono',monospace;
+  font-weight:700;
+  font-size:13px;
+  color:var(--text-muted);
+}
+.escala-brand-names{display:flex;flex-direction:column;line-height:1.3;}
+#mitBrandName{font-size:14px;font-weight:700;color:var(--text-primary);}
+#mitBrandSub{font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace;}
+.escala-brand-btn{
+  background:none;
+  border:1px solid var(--border-strong);
+  color:var(--text-primary);
+  border-radius:9px;
+  padding:7px 13px;
+  font-size:12.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:border-color .15s,background .15s;
+}
+.escala-brand-btn:hover{border-color:var(--text-muted);background:var(--bg-panel-2);}
+
+.app-header h1{
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:clamp(30px,4vw,44px);
+  letter-spacing:-0.01em;
+  margin:0 0 6px;
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+}
+.app-header h1 .note{
+  color:var(--accent-amber);
+  font-size:0.7em;
+}
+.app-header .subtitle{
+  margin:0;
+  color:var(--text-muted);
+  font-size:15px;
+  max-width:520px;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:270px 1fr;
+  gap:22px;
+  align-items:start;
+}
+@media (max-width:820px){
+  .layout{grid-template-columns:1fr;}
+}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  position:sticky;
+  top:16px;
+}
+@media (max-width:820px){ .sidebar{position:static;} }
+
+.sidebar-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+  padding:0 2px;
+}
+.sidebar-head span{
+  font-family:'Fraunces',serif;
+  font-weight:600;
+  font-size:14px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.btn-new{
+  background:none;
+  border:1px solid var(--accent-amber-dim);
+  color:var(--accent-amber);
+  border-radius:8px;
+  padding:6px 11px;
+  font-size:13px;
+  font-weight:600;
+  transition:background 0.15s,color 0.15s;
+}
+.btn-new:hover{background:var(--accent-amber);color:#1B1730;}
+
+.escala-list{display:flex;flex-direction:column;gap:3px;max-height:60vh;overflow-y:auto;}
+@media (max-width:820px){ .escala-list{max-height:none; flex-direction:row; overflow-x:auto; gap:8px; padding-bottom:4px;} }
+
+.escala-item{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 10px 9px 6px;
+  border-radius:9px;
+  border:1px solid transparent;
+  cursor:pointer;
+  transition:background 0.12s,border-color 0.12s;
+  min-width:0;
+}
+.escala-item:hover{background:var(--bg-panel-2);}
+.escala-item.active{background:var(--bg-panel-2);border-color:var(--border-strong);}
+.escala-item .note-svg{flex-shrink:0;width:20px;height:20px;}
+.escala-item .info{min-width:0;flex:1;}
+.escala-item .name{
+  font-size:14px;font-weight:600;color:var(--text-primary);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.escala-item .meta{font-size:11px;color:var(--text-faint);}
+.escala-item .actions{display:flex;gap:2px;opacity:0;transition:opacity 0.12s;flex-shrink:0;}
+.escala-item:hover .actions,.escala-item.active .actions{opacity:1;}
+.icon-btn{
+  background:none;border:none;color:var(--text-faint);
+  width:24px;height:24px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+}
+.icon-btn:hover{color:var(--text-primary);background:rgba(245,239,230,0.08);}
+.icon-btn.danger:hover{color:var(--danger);}
+
+.rename-input{
+  background:var(--bg-input);
+  border:1px solid var(--accent-amber-dim);
+  color:var(--text-primary);
+  border-radius:6px;
+  padding:5px 7px;
+  font-size:14px;
+  width:100%;
+}
+
+.empty-sidebar{color:var(--text-faint);font-size:13px;padding:14px 6px;line-height:1.5;}
+
+/* ---------- editor ---------- */
+.editor{min-height:400px;}
+
+.empty-state{
+  background:var(--bg-panel);
+  border:1px dashed var(--border-strong);
+  border-radius:14px;
+  padding:60px 30px;
+  text-align:center;
+  color:var(--text-muted);
+}
+.empty-state h2{
+  font-family:'Fraunces',serif;
+  color:var(--text-primary);
+  font-size:22px;
+  margin:0 0 8px;
+}
+.empty-state p{margin:0 0 20px;font-size:14px;}
+
+.editor-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.editor-title{
+  font-family:'Fraunces',serif;
+  font-size:22px;
+  font-weight:600;
+  display:flex;align-items:center;gap:10px;
+}
+.editor-topbar .top-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+.btn-ghost{
+  background:none;
+  border:1px solid var(--border-strong);
+  color:var(--text-primary);
+  border-radius:9px;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:600;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:border-color 0.15s,background 0.15s;
+}
+.btn-ghost:hover{border-color:var(--text-muted);background:var(--bg-panel-2);}
+.btn-primary{
+  background:var(--accent-amber);
+  border:1px solid var(--accent-amber);
+  color:#1B1730;
+  border-radius:9px;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:700;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary:hover{background:#f0b459;}
+
+.panel{
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:22px 22px 8px;
+  margin-bottom:18px;
+}
+
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media (max-width:520px){ .field-row{grid-template-columns:1fr;} }
+.field label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:600;letter-spacing:0.02em;}
+.field input{
+  width:100%;
+  background:var(--bg-input);
+  border:1px solid var(--border-strong);
+  color:var(--text-primary);
+  border-radius:8px;
+  padding:9px 11px;
+  font-size:14px;
+}
+.field input:focus{outline:none;border-color:var(--accent-amber-dim);}
+
+.section-head{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;
+}
+.section-staff{flex-shrink:0;width:36px;height:20px;}
+.section-head h3{
+  font-family:'Fraunces',serif;
+  font-size:16px;font-weight:600;
+  margin:0;
+  letter-spacing:0.01em;
+}
+
+.row-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.row-item{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:8px;
+  align-items:center;
+}
+@media (max-width:560px){ .row-item{grid-template-columns:1fr;} .row-item .row-controls{justify-content:flex-end;} }
+
+.row-item input{
+  background:var(--bg-input);
+  border:1px solid var(--border);
+  color:var(--text-primary);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13.5px;
+  width:100%;
+}
+.row-item input:focus{outline:none;border-color:var(--border-strong);}
+.row-item input.role-input{color:var(--text-muted);font-weight:600;}
+
+.row-controls{display:flex;gap:2px;justify-content:flex-end;}
+
+.btn-add-row{
+  background:none;
+  border:1px dashed var(--border-strong);
+  color:var(--text-muted);
+  border-radius:8px;
+  padding:8px 12px;
+  font-size:13px;
+  font-weight:600;
+  width:100%;
+  text-align:left;
+  transition:border-color .15s,color .15s;
+  margin-bottom:12px;
+}
+.btn-add-row:hover{border-color:var(--accent-amber-dim);color:var(--accent-amber);}
+
+.accent-instrumentos{color:var(--accent-amber);}
+.accent-vocal{color:var(--accent-rose);}
+.accent-midia{color:var(--accent-teal);}
+.accent-cronograma{color:var(--accent-amber);}
+.accent-repertorio{color:var(--accent-rose);}
+
+.repertorio-row{
+  display:grid;
+  grid-template-columns:32px 1fr 110px auto;
+  gap:8px;
+  align-items:center;
+}
+@media (max-width:560px){ .repertorio-row{grid-template-columns:24px 1fr 90px auto;} }
+.rep-num{
+  font-family:'IBM Plex Mono',monospace;
+  color:var(--text-faint);
+  font-size:13px;
+  text-align:right;
+}
+
+/* preview */
+.preview-wrap{
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:22px;
+  margin-bottom:30px;
+}
+.preview-wrap .section-head h3{color:var(--text-primary);}
+.preview-text{
+  white-space:pre-wrap;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;
+  line-height:1.65;
+  background:var(--bg-input);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px;
+  color:#E5DEEF;
+  max-height:420px;
+  overflow-y:auto;
+}
+.preview-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+
+/* modal */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(10,8,20,0.6);
+  display:flex;align-items:center;justify-content:center;
+  z-index:50;
+  padding:20px;
+}
+.modal-box{
+  background:var(--bg-panel-2);
+  border:1px solid var(--border-strong);
+  border-radius:14px;
+  padding:24px;
+  max-width:360px;
+  width:100%;
+}
+.modal-box h4{
+  font-family:'Fraunces',serif;
+  margin:0 0 8px;
+  font-size:18px;
+}
+.modal-box p{color:var(--text-muted);font-size:14px;margin:0 0 20px;line-height:1.5;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+
+.toast{
+  position:fixed;
+  bottom:24px;left:50%;
+  transform:translateX(-50%);
+  background:var(--accent-amber);
+  color:#1B1730;
+  font-weight:700;
+  font-size:13px;
+  padding:10px 18px;
+  border-radius:24px;
+  z-index:60;
+  opacity:0;
+  transition:opacity 0.2s, transform 0.2s;
+  pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script src="mit-license.js"></script>
+<script src="mit-brand.js" data-default-name="Sua Produtora / Igreja" data-default-sub="Configure o nome da sua produtora ou igreja" data-storage-key="mit_brand_v1"></script>
+<script src="mit-cloud-sync.js"></script>
+<script src="mit-cloud-bridge.js"></script>
+<script>
+/* ============ storage helpers ============ */
+// Usa localStorage de verdade (igual a todo o resto da suíte MIT) — a API
+// window.storage só existe dentro do ambiente de artifacts do Claude; fora
+// dali (num site publicado de verdade) ela não existe, e os dados
+// desapareceriam a cada recarregamento da página sem essa troca.
+const INDEX_KEY = 'ministerio-escalas-index';
+function escalaKey(id){ return 'ministerio-escala:' + id; }
+
+async function storeGet(key){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+async function storeSet(key, value){
+  try{
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  }catch(e){ console.error('storage error', e); return false; }
+}
+async function storeDelete(key){
+  try{ localStorage.removeItem(key); }catch(e){}
+}
+
+/* ============ default data ============ */
+function uid(){ return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function defaultData(){
+  return {
+    date:'',
+    time:'',
+    instrumentos:[
+      {role:'Teclado', name:''},
+      {role:'Violão', name:''},
+      {role:'Guitarra', name:''},
+      {role:'Baixo', name:''},
+      {role:'Bateria', name:''},
+    ],
+    vocal:[
+      {role:'Vocal Principal', name:''},
+      {role:'Backing vocal', name:''},
+      {role:'Backing vocal', name:''},
+    ],
+    midia:[
+      {role:'Mesa', name:''},
+      {role:'Luz', name:''},
+      {role:'Slide', name:''},
+      {role:'Foto', name:''},
+      {role:'Live', name:''},
+    ],
+    cronograma:[
+      {role:'Passagem de som / Ensaio', name:''},
+      {role:'Oração da equipe', name:''},
+    ],
+    repertorio:[
+      {role:'', name:''},
+      {role:'', name:''},
+      {role:'', name:''},
+      {role:'', name:''},
+    ],
+    footer:'⚠️ Caso tenha algum imprevisto ou não possa comparecer, avise no privado com antecedência para encontrarmos um substituto. Deus abençoe o ministério de cada um!'
+  };
+}
+
+/* ============ app state ============ */
+let index = [];      // [{id,name,updatedAt}]
+let currentId = null;
+let currentData = null;
+let renamingId = null;
+
+/* ============ init ============ */
+async function init(){
+  const idx = await storeGet(INDEX_KEY);
+  index = idx || [];
+  if(index.length){
+    currentId = index[0].id;
+    currentData = await storeGet(escalaKey(currentId)) || defaultData();
+  }
+  render();
+}
+
+async function persistIndex(){
+  await storeSet(INDEX_KEY, index);
+}
+async function persistCurrent(){
+  if(currentId){
+    await storeSet(escalaKey(currentId), currentData);
+    const item = index.find(i=>i.id===currentId);
+    if(item){ item.updatedAt = Date.now(); await persistIndex(); renderSidebarOnly(); }
+    publicarEscalaNaNuvem(currentId);
+  }
+}
+
+/* ============ actions ============ */
+async function createEscala(){
+  const id = uid();
+  const name = 'MIT Escala';
+  index.unshift({id, name, updatedAt: Date.now()});
+  await persistIndex();
+  currentId = id;
+  currentData = defaultData();
+  await storeSet(escalaKey(id), currentData);
+  publicarEscalaNaNuvem(id);
+  renamingId = id;
+  render();
+}
+
+async function selectEscala(id){
+  if(id === currentId) return;
+  currentId = id;
+  currentData = await storeGet(escalaKey(id)) || defaultData();
+  render();
+}
+
+async function duplicateEscala(id){
+  const src = index.find(i=>i.id===id);
+  if(!src) return;
+  const data = await storeGet(escalaKey(id)) || defaultData();
+  const newId = uid();
+  index.unshift({id:newId, name: src.name + ' (cópia)', updatedAt: Date.now()});
+  await persistIndex();
+  await storeSet(escalaKey(newId), data);
+  currentId = newId;
+  currentData = data;
+  render();
+}
+
+function startRename(id){
+  renamingId = id;
+  render();
+}
+async function commitRename(id, newName){
+  const item = index.find(i=>i.id===id);
+  if(item){
+    item.name = (newName || '').trim() || 'Escala sem nome';
+    item.updatedAt = Date.now();
+    await persistIndex();
+    publicarEscalaNaNuvem(id);
+  }
+  renamingId = null;
+  render();
+}
+
+function askDelete(id){
+  const item = index.find(i=>i.id===id);
+  if(!item) return;
+  showModal({
+    title:'Excluir "' + item.name + '"?',
+    body:'Essa ação remove a escala e todas as informações preenchidas nela. Não é possível desfazer.',
+    confirmLabel:'Excluir',
+    danger:true,
+    onConfirm: async ()=>{
+      index = index.filter(i=>i.id!==id);
+      await persistIndex();
+      await storeDelete(escalaKey(id));
+      MitCloudBridge.excluir('escala', id);
+      if(currentId===id){
+        if(index.length){
+          currentId = index[0].id;
+          currentData = await storeGet(escalaKey(currentId)) || defaultData();
+        }else{
+          currentId = null; currentData = null;
+        }
+      }
+      render();
+    }
+  });
+}
+
+/* row operations */
+function addRow(section){
+  currentData[section].push({role:'', name:''});
+  render();
+  persistCurrent();
+}
+function removeRow(section, idx){
+  currentData[section].splice(idx,1);
+  render();
+  persistCurrent();
+}
+function moveRow(section, idx, dir){
+  const arr = currentData[section];
+  const newIdx = idx + dir;
+  if(newIdx < 0 || newIdx >= arr.length) return;
+  const tmp = arr[idx]; arr[idx] = arr[newIdx]; arr[newIdx] = tmp;
+  render();
+  persistCurrent();
+}
+
+/* ============ message builder ============ */
+function fmt(v, fallback){ return (v && v.trim()) ? v : fallback; }
+
+function buildMessage(){
+  const d = currentData;
+  let lines = [];
+  lines.push('\u266A *ESCALA DO MINISTÉRIO DE LOUVOR* \u266A');
+  lines.push('');
+  lines.push('Olá, equipe! Segue a nossa escala de músicos, vocalistas e mídia para o próximo culto.');
+  lines.push('');
+  lines.push('\u2022 *Data:* ' + fmt(d.date, '[a definir]'));
+  lines.push('\u2022 *Horário do Culto:* ' + fmt(d.time, '[a definir]'));
+  lines.push('');
+  lines.push('\u266B *INSTRUMENTOS*');
+  d.instrumentos.forEach(r=>{
+    if(r.role || r.name) lines.push('   ' + fmt(r.role,'[Instrumento]') + ': ' + fmt(r.name,'[Nome]'));
+  });
+  lines.push('');
+  lines.push('\u266A *VOCAL*');
+  d.vocal.forEach(r=>{
+    if(r.role || r.name) lines.push('   ' + fmt(r.role,'[Vocal]') + ': ' + fmt(r.name,'[Nome]'));
+  });
+  lines.push('');
+  lines.push('\u266B *MÍDIA*');
+  d.midia.forEach(r=>{
+    if(r.role || r.name) lines.push('   ' + fmt(r.role,'[Função]') + ': ' + fmt(r.name,'[Nome]'));
+  });
+  lines.push('');
+  lines.push('\u2022 *CRONOGRAMA (Importante!)*');
+  d.cronograma.forEach(r=>{
+    if(r.role || r.name) lines.push('   ' + fmt(r.role,'[Item]') + ': ' + fmt(r.name,'[Horário]'));
+  });
+  lines.push('');
+  lines.push('\u266A *REPERTÓRIO*');
+  d.repertorio.forEach((r,i)=>{
+    if(r.role || r.name) lines.push('   ' + (i+1) + '. ' + fmt(r.role,'[Música]') + (r.name ? ' - ' + r.name : ''));
+  });
+  lines.push('');
+  const footerClean = (d.footer || '').replace(/^[\u26A0\u2022\uFE0F\s]+/, '');
+  lines.push('*Atenção:* ' + footerClean);
+  return lines.join('\n');
+}
+
+/* ============ render ============ */
+function esc(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function staffLinesSvg(width, height, count, strokeVar){
+  let lines = '';
+  const gap = height/(count+1);
+  for(let i=1;i<=count;i++){
+    const y = Math.round(gap*i);
+    lines += `<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="var(${strokeVar})" stroke-width="1"/>`;
+  }
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${lines}</svg>`;
+}
+
+function noteIconSvg(colorVar, offsetIdx){
+  const positions = [4,9,14,9,4];
+  const y = positions[offsetIdx % positions.length];
+  return `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="4" x2="20" y2="4" stroke="var(--border)" stroke-width="1"/>
+    <line x1="0" y1="9" x2="20" y2="9" stroke="var(--border)" stroke-width="1"/>
+    <line x1="0" y1="14" x2="20" y2="14" stroke="var(--border)" stroke-width="1"/>
+    <ellipse cx="10" cy="${y}" rx="4.2" ry="3.2" fill="var(${colorVar})" transform="rotate(-18 10 ${y})"/>
+    <line x1="13.6" y1="${y-1}" x2="13.6" y2="${y-14}" stroke="var(${colorVar})" stroke-width="1.3"/>
+  </svg>`;
+}
+
+function sectionStaffSvg(colorVar){
+  return `<svg viewBox="0 0 36 20" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="4" x2="36" y2="4" stroke="var(--border)" stroke-width="1"/>
+    <line x1="0" y1="10" x2="36" y2="10" stroke="var(--border)" stroke-width="1"/>
+    <line x1="0" y1="16" x2="36" y2="16" stroke="var(--border)" stroke-width="1"/>
+    <ellipse cx="10" cy="10" rx="5" ry="3.6" fill="var(${colorVar})" transform="rotate(-18 10 10)"/>
+    <line x1="14.6" y1="9" x2="14.6" y2="-3" stroke="var(${colorVar})" stroke-width="1.4"/>
+  </svg>`;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <header class="app-header">
+      <div class="staff-bg">${staffLinesSvg(1180,70,5,'--border-strong')}</div>
+      <div class="header-content">
+        <div class="escala-brand-row">
+          <span class="escala-brand-logo">
+            <img id="mitBrandLogoImg" src="logo-mit.png" alt="Logo" hidden>
+            <span id="mitBrandLogoFallback"></span>
+          </span>
+          <span class="escala-brand-names">
+            <span id="mitBrandName"></span>
+            <span id="mitBrandSub"></span>
+          </span>
+          <div style="margin-left:auto; display:flex; gap:12px;">
+            <button type="button" class="escala-brand-btn" onclick="abrirModalNuvemEscala()">
+              <span id="nuvemStatusDot" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#5b6068; margin-right:5px;"></span><span id="nuvemStatusLabel">Nuvem</span>
+            </button>
+            <button type="button" class="escala-brand-btn" onclick="MitBrand.open()">Marca</button>
+          </div>
+        </div>
+        <h1>MIT Escala <span class="note">♪</span></h1>
+        <p class="subtitle">Monte a escala de músicos, vocais, mídia e o cronograma de cada culto — e envie tudo pronto pra equipe.</p>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <span>Escalas</span>
+          <button class="btn-new" id="btnNewEscala">+ Nova</button>
+        </div>
+        <div class="escala-list" id="escalaList"></div>
+      </aside>
+      <main class="editor" id="editor"></main>
+    </div>
+  `;
+  document.getElementById('btnNewEscala').onclick = createEscala;
+  if (window.MitBrand) MitBrand.render();
+  if (window.atualizarBotaoNuvemEscala) atualizarBotaoNuvemEscala();
+  renderSidebarOnly();
+  renderEditorOnly();
+}
+
+function renderSidebarOnly(){
+  const list = document.getElementById('escalaList');
+  if(!list) return;
+  if(!index.length){
+    list.innerHTML = `<div class="empty-sidebar">Nenhuma escala ainda. Toque em "+ Nova" para criar a primeira.</div>`;
+    return;
+  }
+  const sorted = [...index].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  list.innerHTML = sorted.map((item, i)=>{
+    const active = item.id === currentId;
+    if(renamingId === item.id){
+      return `<div class="escala-item active">
+        <input class="rename-input" id="renameInput" value="${esc(item.name)}" />
+      </div>`;
+    }
+    const date = item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('pt-BR') : '';
+    return `<div class="escala-item ${active?'active':''}" data-id="${item.id}">
+      <span class="note-svg">${noteIconSvg(active?'--accent-amber':'--text-faint', i)}</span>
+      <span class="info">
+        <div class="name">${esc(item.name)}</div>
+        <div class="meta">${date}</div>
+      </span>
+      <span class="actions">
+        <button class="icon-btn" data-action="rename" title="Renomear">✎</button>
+        <button class="icon-btn" data-action="duplicate" title="Duplicar">⧉</button>
+        <button class="icon-btn danger" data-action="delete" title="Excluir">✕</button>
+      </span>
+    </div>`;
+  }).join('');
+
+  if(renamingId){
+    const input = document.getElementById('renameInput');
+    input.focus();
+    input.select();
+    input.onkeydown = (e)=>{
+      if(e.key==='Enter') commitRename(renamingId, input.value);
+      if(e.key==='Escape'){ renamingId=null; render(); }
+    };
+    input.onblur = ()=> commitRename(renamingId, input.value);
+  }
+
+  list.querySelectorAll('.escala-item[data-id]').forEach(el=>{
+    const id = el.getAttribute('data-id');
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('.icon-btn')) return;
+      selectEscala(id);
+    });
+    el.querySelector('[data-action="rename"]').addEventListener('click', (e)=>{ e.stopPropagation(); startRename(id); });
+    el.querySelector('[data-action="duplicate"]').addEventListener('click', (e)=>{ e.stopPropagation(); duplicateEscala(id); });
+    el.querySelector('[data-action="delete"]').addEventListener('click', (e)=>{ e.stopPropagation(); askDelete(id); });
+  });
+}
+
+function rowListHtml(section, rows, roleLabel, nameLabel, addLabel){
+  const rowsHtml = rows.map((r,idx)=>`
+    <div class="row-item" data-section="${section}" data-idx="${idx}">
+      <input class="role-input" placeholder="${roleLabel}" value="${esc(r.role)}" data-field="role" />
+      <input placeholder="${nameLabel}" value="${esc(r.name)}" data-field="name" />
+      <span class="row-controls">
+        <button class="icon-btn" data-action="up" title="Mover para cima">↑</button>
+        <button class="icon-btn" data-action="down" title="Mover para baixo">↓</button>
+        <button class="icon-btn danger" data-action="remove" title="Remover">✕</button>
+      </span>
+    </div>
+  `).join('');
+  return `<div class="row-list" data-list="${section}">${rowsHtml}</div>
+    <button class="btn-add-row" data-add="${section}">+ ${addLabel}</button>`;
+}
+
+function repertorioHtml(rows){
+  const rowsHtml = rows.map((r,idx)=>`
+    <div class="repertorio-row" data-section="repertorio" data-idx="${idx}">
+      <span class="rep-num">${idx+1}.</span>
+      <input placeholder="Nome da música" value="${esc(r.role)}" data-field="role" />
+      <input placeholder="Tom" value="${esc(r.name)}" data-field="name" />
+      <span class="row-controls">
+        <button class="icon-btn" data-action="up" title="Mover para cima">↑</button>
+        <button class="icon-btn" data-action="down" title="Mover para baixo">↓</button>
+        <button class="icon-btn danger" data-action="remove" title="Remover">✕</button>
+      </span>
+    </div>
+  `).join('');
+  return `<div class="row-list" data-list="repertorio">${rowsHtml}</div>
+    <button class="btn-add-row" data-add="repertorio">+ Adicionar música</button>`;
+}
+
+function renderEditorOnly(){
+  const editor = document.getElementById('editor');
+  if(!currentId || !currentData){
+    editor.innerHTML = `
+      <div class="empty-state">
+        <h2>Nenhuma escala selecionada</h2>
+        <p>Crie uma escala para começar a preencher músicos, vocais, mídia e o cronograma do culto.</p>
+        <button class="btn-primary" id="btnEmptyNew">+ Criar primeira escala</button>
+      </div>`;
+    document.getElementById('btnEmptyNew').onclick = createEscala;
+    return;
+  }
+
+  const currentName = (index.find(i=>i.id===currentId)||{}).name || '';
+  const d = currentData;
+
+  editor.innerHTML = `
+    <div class="editor-topbar">
+      <div class="editor-title">${esc(currentName)}</div>
+      <div class="top-actions">
+        <button class="btn-ghost" id="btnDuplicateTop">⧉ Duplicar</button>
+        <button class="btn-ghost" id="btnDeleteTop">✕ Excluir</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-head"><span class="section-staff">${sectionStaffSvg('--accent-amber')}</span><h3>Data e horário</h3></div>
+      <div class="field-row">
+        <div class="field"><label>Data</label><input type="text" id="fieldDate" placeholder="Ex: 10/08 (Domingo)" value="${esc(d.date)}"></div>
+        <div class="field"><label>Horário do culto</label><input type="text" id="fieldTime" placeholder="Ex: 18h30" value="${esc(d.time)}"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-head"><span class="section-staff">${sectionStaffSvg('--accent-amber')}</span><h3 class="accent-instrumentos">🎹 Instrumentos</h3></div>
+      ${rowListHtml('instrumentos', d.instrumentos, 'Instrumento', 'Nome do músico', 'Adicionar instrumento')}
+    </div>
+
+    <div class="panel">
+      <div class="section-head"><span class="section-staff">${sectionStaffSvg('--accent-rose')}</span><h3 class="accent-vocal">🎤 Vocal</h3></div>
+      ${rowListHtml('vocal', d.vocal, 'Função vocal', 'Nome', 'Adicionar vocal')}
+    </div>
+
+    <div class="panel">
+      <div class="section-head"><span class="section-staff">${sectionStaffSvg('--accent-teal')}</span><h3 class="accent-midia">🎵 Mídia</h3></div>
+      ${rowListHtml('midia', d.midia, 'Função', 'Nome', 'Adicionar função de mídia')}
+    </div>
+
+    <div class="panel">
+      <div class="section-head"><span class="section-staff">${sectionStaffSvg('--accent-amber')}</span><h3 class="accent-cronograma">⏰ Cronograma</h3></div>
+      ${rowListHtml('cronograma', d.cronograma, 'Item', 'Horário', 'Adicionar item ao cronograma')}
+    </div>
+
+    <div class="panel">
+      <div class="section-head"><span class="section-staff">${sectionStaffSvg('--accent-rose')}</span><h3 class="accent-repertorio">🎶 Repertório</h3></div>
+      ${repertorioHtml(d.repertorio)}
+    </div>
+
+    <div class="preview-wrap">
+      <div class="section-head"><h3>Mensagem pronta pra equipe</h3></div>
+      <div class="preview-text" id="previewText"></div>
+      <div class="preview-actions">
+        <button class="btn-primary" id="btnCopy">Copiar mensagem</button>
+        <button class="btn-ghost" id="btnWhatsapp">Abrir no WhatsApp</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('previewText').textContent = buildMessage();
+
+  document.getElementById('btnDuplicateTop').onclick = ()=>duplicateEscala(currentId);
+  document.getElementById('btnDeleteTop').onclick = ()=>askDelete(currentId);
+
+  const fieldDate = document.getElementById('fieldDate');
+  const fieldTime = document.getElementById('fieldTime');
+  fieldDate.addEventListener('input', ()=>{ currentData.date = fieldDate.value; refreshPreview(); });
+  fieldDate.addEventListener('blur', persistCurrent);
+  fieldTime.addEventListener('input', ()=>{ currentData.time = fieldTime.value; refreshPreview(); });
+  fieldTime.addEventListener('blur', persistCurrent);
+
+  ['instrumentos','vocal','midia','cronograma','repertorio'].forEach(section=>{
+    editor.querySelectorAll(`[data-list="${section}"] [data-section="${section}"]`).forEach(rowEl=>{
+      const idx = parseInt(rowEl.getAttribute('data-idx'));
+      rowEl.querySelectorAll('input[data-field]').forEach(inp=>{
+        const field = inp.getAttribute('data-field');
+        inp.addEventListener('input', ()=>{
+          currentData[section][idx][field] = inp.value;
+          refreshPreview();
+        });
+        inp.addEventListener('blur', persistCurrent);
+      });
+      rowEl.querySelector('[data-action="up"]').addEventListener('click', ()=>moveRow(section, idx, -1));
+      rowEl.querySelector('[data-action="down"]').addEventListener('click', ()=>moveRow(section, idx, 1));
+      rowEl.querySelector('[data-action="remove"]').addEventListener('click', ()=>removeRow(section, idx));
+    });
+    const addBtn = editor.querySelector(`[data-add="${section}"]`);
+    if(addBtn) addBtn.addEventListener('click', ()=>addRow(section));
+  });
+
+  document.getElementById('btnCopy').onclick = async ()=>{
+    const text = buildMessage();
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast('Mensagem copiada!');
+    }catch(e){
+      showToast('Não foi possível copiar automaticamente.');
+    }
+  };
+  document.getElementById('btnWhatsapp').onclick = ()=>{
+    const text = buildMessage();
+    const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+    window.open(url, '_blank');
+  };
+}
+
+function refreshPreview(){
+  const el = document.getElementById('previewText');
+  if(el) el.textContent = buildMessage();
+}
+
+/* ============ modal ============ */
+function showModal({title, body, confirmLabel, danger, onConfirm}){
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-box">
+        <h4>${esc(title)}</h4>
+        <p>${esc(body)}</p>
+        <div class="modal-actions">
+          <button class="btn-ghost" id="modalCancel">Cancelar</button>
+          <button class="${danger?'btn-ghost':'btn-primary'}" id="modalConfirm" style="${danger?'border-color:var(--danger);color:var(--danger);':''}">${esc(confirmLabel)}</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const overlay = document.getElementById('modalOverlay');
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeModal(); });
+  document.getElementById('modalCancel').onclick = closeModal;
+  document.getElementById('modalConfirm').onclick = ()=>{ closeModal(); onConfirm(); };
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
+
+/* ============ toast ============ */
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ============ MIT Cloud Sync — sincronização opcional entre aparelhos ============ */
+// Continua funcionando 100% local sem nunca configurar isso. Quando
+// conectado, criar/editar/renomear/excluir uma escala TAMBÉM sobe pra
+// nuvem, e o que outro aparelho/membro salvar aparece aqui na hora.
+
+function lerTokenLicencaEscala(){
+  try{
+    const raw = localStorage.getItem('mit_license_v1');
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+// O item da nuvem é a escala inteira (nome + todos os campos preenchidos)
+// — assim como está representada localmente entre o índice e os dados.
+function escalaParaDadosDaNuvem(id){
+  const item = index.find(i => i.id === id);
+  if(!item) return null;
+  const dados = (id === currentId) ? currentData : null;
+  return { id, name: item.name, updatedAt: item.updatedAt, ...(dados || {}) };
+}
+
+MitCloudBridge.registrarTipo('escala', {
+  obterTodos: () => index.map(i => escalaParaDadosDaNuvem(i.id)),
+  obterPorId: (id) => index.find(i => i.id === id),
+  aoReceberDaNuvem: async (dadosDaNuvem) => {
+    const { id, name, updatedAt, ...dadosEscala } = dadosDaNuvem;
+    await storeSet(escalaKey(id), dadosEscala);
+    const existente = index.find(i => i.id === id);
+    if(existente){ existente.name = name; existente.updatedAt = updatedAt || Date.now(); }
+    else index.unshift({ id, name, updatedAt: updatedAt || Date.now() });
+    await persistIndex();
+    if(id === currentId) currentData = dadosEscala;
+    render();
+  },
+  aoExcluirDaNuvem: async (itemId) => {
+    index = index.filter(i => i.id !== itemId);
+    await persistIndex();
+    await storeDelete(escalaKey(itemId));
+    if(currentId === itemId){
+      if(index.length){ currentId = index[0].id; currentData = await storeGet(escalaKey(currentId)) || defaultData(); }
+      else { currentId = null; currentData = null; }
+    }
+    render();
+  },
+});
+
+function publicarEscalaNaNuvem(id){
+  const dados = escalaParaDadosDaNuvem(id);
+  if(dados) MitCloudBridge.publicar('escala', dados);
+}
+
+function atualizarBotaoNuvemEscala(){
+  const dot = document.getElementById('nuvemStatusDot');
+  const label = document.getElementById('nuvemStatusLabel');
+  if(!dot || !label) return; // header ainda não desenhado nesta passada
+  const status = MitCloudBridge.status();
+  const cores = { desconectado:'#5b6068', conectando:'#e8a33d', conectado:'#4fd1c5', erro:'#d65b5b' };
+  const textos = { desconectado:'Nuvem', conectando:'Conectando…', conectado:'Conectado', erro:'Erro' };
+  dot.style.background = cores[status] || cores.desconectado;
+  label.textContent = textos[status] || 'Nuvem';
+}
+MitCloudBridge.onStatus(atualizarBotaoNuvemEscala);
+
+function abrirModalNuvemEscala(){
+  const token = lerTokenLicencaEscala();
+  const conectadoAgora = MitCloudBridge.conectado();
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="modal-overlay" id="nuvemModalOverlay">
+      <div class="modal-box">
+        <h4>Sincronizar com a Nuvem</h4>
+        <p>Conecte a uma lista compartilhada pra que as escalas que você montar aqui apareçam
+        automaticamente pros outros membros licenciados dessa lista, em qualquer aparelho — e
+        vice-versa. Sem conectar, o app continua funcionando 100% local.</p>
+        ${!token ? '<p style="color:var(--accent-amber);">É preciso um token de acesso válido pra conectar.</p>' : ''}
+        <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:4px;">Endereço do servidor MIT Cloud Sync</label>
+        <input type="text" id="nuvemServidorInputEscala" style="width:100%; margin-bottom:12px; padding:9px 12px; background:var(--bg-panel-2); border:1px solid var(--border-strong); border-radius:8px; color:var(--text-primary);" placeholder="https://mit-cloud-sync.seu-subdominio.workers.dev" />
+        <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:4px;">Lista</label>
+        <select id="nuvemListaSelectEscala" style="width:100%; margin-bottom:20px; padding:9px 12px; background:var(--bg-panel-2); border:1px solid var(--border-strong); border-radius:8px; color:var(--text-primary);"><option>Carregando…</option></select>
+        <div class="modal-actions">
+          ${conectadoAgora ? '<button class="btn-ghost" id="nuvemDesconectarBtnEscala">Desconectar</button>' : ""}
+          <button class="btn-ghost" id="nuvemCancelarBtnEscala">Cancelar</button>
+          <button class="btn-primary" id="nuvemConectarBtnEscala" ${!token ? "disabled" : ""}>${conectadoAgora ? "Trocar de lista" : "Conectar"}</button>
+        </div>
+      </div>
+    </div>`;
+
+  const overlay = document.getElementById('nuvemModalOverlay');
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
+  document.getElementById('nuvemCancelarBtnEscala').onclick = closeModal;
+  document.getElementById('nuvemDesconectarBtnEscala')?.addEventListener('click', () => {
+    MitCloudBridge.desconectar();
+    atualizarBotaoNuvemEscala();
+    closeModal();
+  });
+
+  const servidorInput = document.getElementById('nuvemServidorInputEscala');
+  const listaSelect = document.getElementById('nuvemListaSelectEscala');
+  servidorInput.value = MitCloudSync.obterServidor();
+
+  async function carregarListas(){
+    const servidor = servidorInput.value.trim();
+    if(!servidor || !token){ listaSelect.innerHTML = '<option value="">Configure o servidor e o token primeiro</option>'; return; }
+    MitCloudSync.definirServidor(servidor);
+    MitCloudSync.definirToken(token);
+    try{
+      const { listas } = await MitCloudSync.minhasListas();
+      if(!listas.length){ listaSelect.innerHTML = '<option value="">Nenhuma lista ainda — crie uma no app "MIT Nuvem"</option>'; return; }
+      listaSelect.innerHTML = listas.map(l => `<option value="${l.id}">${esc(l.nome)}</option>`).join('');
+    }catch(e){
+      listaSelect.innerHTML = `<option value="">Erro: ${esc(e.message)}</option>`;
+    }
+  }
+  carregarListas();
+  servidorInput.addEventListener('change', carregarListas);
+
+  document.getElementById('nuvemConectarBtnEscala').addEventListener('click', async () => {
+    const listaId = listaSelect.value;
+    if(!listaId){ showToast('Escolha uma lista.'); return; }
+    const resultado = await MitCloudBridge.conectar({ token, listaId });
+    if(resultado.ok){ showToast('Conectado à nuvem.'); closeModal(); }
+    else showToast(resultado.erro || 'Não foi possível conectar.');
+    atualizarBotaoNuvemEscala();
+  });
+}
+
+async function reconectarNuvemSalvaEscala(){
+  const listaId = MitCloudBridge.ultimaListaSalva();
+  const token = lerTokenLicencaEscala();
+  if(!listaId || !token || !MitCloudSync.obterServidor()) return;
+  await MitCloudBridge.conectar({ token, listaId });
+  atualizarBotaoNuvemEscala();
+}
+
+init();
+reconectarNuvemSalvaEscala();
+</script>
+</body>
+</html>
